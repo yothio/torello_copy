@@ -1,8 +1,9 @@
-import React from 'react'
-import { Navbar as MatineNavbar } from '@mantine/core';
+import { Navbar as MatineNavbar } from "@mantine/core"
 
 export default function Navbar() {
   return (
-    <MatineNavbar width={{ base: 300 }} height={500} p="xs">{/* Navbar content */}</MatineNavbar>  
+    <MatineNavbar width={{ base: 300 }} height={500} p="xs">
+      {/* Navbar content */}
+    </MatineNavbar>
   )
 }
