@@ -1,23 +1,23 @@
-export type Task = {
+export type TaskType = {
   title: string
   content: string
   limitDate: Date
   createDate: Date
-  labels: Label[]
+  labels: LabelType[]
 }
 
-export type List = {
-  tasks: Task[]
+export type ListType = {
+  tasks: TaskType[]
   title: string
 }
 
-export type Board = {
+export type BoardType = {
   title: string
-  lists: List[]
-  labels: Label[]
+  lists: ListType[]
+  labels: LabelType[]
 }
 
-export type Label = {
+export type LabelType = {
   name: string
   color: number
 }
