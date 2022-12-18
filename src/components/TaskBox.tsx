@@ -11,7 +11,7 @@ type TaskBoxProps = {
 export const TaskBox: React.FC<TaskBoxProps> = ({ task, index }) => {
   const { title, content } = task
   return (
-    <Draggable draggableId={index.toString()} index={index}>
+    <Draggable draggableId={task.createDate.toDateString()} index={index} key={title}>
       {(provided) => (
         <Box
           sx={(theme) => ({

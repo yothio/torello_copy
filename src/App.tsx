@@ -1,14 +1,9 @@
 import { Layout } from "./components/Layout"
-import { Task } from "./components/Task"
 import {
   DragDropContext,
-  DragDropContextProps,
   Draggable,
-  DragStart,
-  DragUpdate,
   Droppable,
   DropResult,
-  ResponderProvided,
 } from "react-beautiful-dnd"
 import { useState } from "react"
 import { createTask, testCreateTask } from "./repository"
@@ -29,9 +24,8 @@ function App() {
       {
         title: title + boards.length,
         lists: [
-          // { tasks: [testCreateTask(), createTask("abc", "content", new Date("2022-11-22"), [])], title: "Todo" },
-          { tasks: [testCreateTask()], title: "Todo" },
-          { tasks: [], title: "Doing" },
+          { tasks: [testCreateTask(), createTask("abc", "content", new Date("2022-11-22"), [])], title: "Todo" },
+          { tasks: [createTask("123", "content", new Date("2022-11-23"), [])], title: "Doing" },
           { tasks: [], title: "Done" },
           { tasks: [], title: "title1" },
           { tasks: [], title: "title2" },
@@ -57,6 +51,7 @@ function App() {
     console.log("dstDroppableId: " + result.destination?.droppableId)
     console.log("srcIndex: " + result.source.index)
     console.log("dstIndex: " + result.destination?.index)
+
     if (result.type == "lists") {
       const items = [...boards[selectedBoardNum].lists]
       const newBoard = [...boards]
@@ -95,7 +90,6 @@ function App() {
       }
     }
   }
-  const onTaskDragEnd = (result: DropResult) => {}
 
   const navbar: BoardListsProps = {
     TitleArea: <NavbarHeader onClickAdd={addBoardFunc} />,
@@ -107,9 +101,6 @@ function App() {
       </Box>
     ),
   }
-
-  // Task
-  const [tasks, setTasks] = useState([testCreateTask(), createTask("abc", "content", new Date("2022-11-22"), [])])
 
   return (
     <Layout navbarProps={navbar}>

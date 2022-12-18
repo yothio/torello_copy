@@ -1,8 +1,8 @@
-import { Box, ScrollArea, Stack, Text, UnstyledButton } from "@mantine/core"
+import { Box, Stack, UnstyledButton } from "@mantine/core"
 import React from "react"
 import { ListType } from "../type/Data"
 import { TaskBox } from "./TaskBox"
-import { DragDropContext, DragStart, Droppable } from "react-beautiful-dnd"
+import { Droppable } from "react-beautiful-dnd"
 
 type ListBoxProps = {
   list: ListType
@@ -11,7 +11,7 @@ type ListBoxProps = {
 
 export const ListBox: React.FC<ListBoxProps> = ({ list, index }) => {
   return (
-    <Droppable droppableId={index.toString()} type="tasks">
+    <Droppable droppableId={index.toString()} type="tasks" key={list.title}>
       {(provided) => (
         <Box
           sx={(theme) => ({
@@ -28,7 +28,6 @@ export const ListBox: React.FC<ListBoxProps> = ({ list, index }) => {
             "&:hover": {
               backgroundColor: theme.colors.gray[1],
             },
-            flexFlow: "column",
           })}
           {...provided.droppableProps}
           ref={provided.innerRef}
@@ -57,6 +56,7 @@ export const ListBox: React.FC<ListBoxProps> = ({ list, index }) => {
                 "&:hover": {
                   backgroundColor: theme.colors.gray[0],
                 },
+                justifyContent: "space-between",
               })}
             >
               タスクを追加する
