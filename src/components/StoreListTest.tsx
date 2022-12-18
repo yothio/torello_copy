@@ -9,13 +9,16 @@ export const StoreListTest: React.FC<Props> = ({ listKey }) => {
   const addList = () => {
     const newBoard = { key: `test_key_${lists.length}`, name: `test_value_${lists.length}` }
     setLists([...lists, newBoard])
-    saveLists(listKey, lists)
   }
 
   useEffect(() => {
     console.log({ ...lists })
     setLists(getLists(listKey))
   }, [listKey])
+
+  useEffect(() => {
+    saveLists(listKey, lists)
+  }, [lists])
 
   return (
     <div>

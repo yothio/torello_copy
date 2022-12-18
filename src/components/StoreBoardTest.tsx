@@ -7,14 +7,15 @@ import { StoreListTest } from "./StoreListTest"
 export const StoreBoardTest = () => {
   const [boards, setBoards] = useState(getBoards())
   const [listKey, setListKey] = useState(boards[0]?.key)
-  console.log({ ...boards })
 
   const addBoard = () => {
     const newBoard = { key: `test_key_${boards.length}`, value: `test_value_${boards.length}` }
     setBoards([...boards, newBoard])
-    saveBoards(boards)
+    console.log({ ...boards })
   }
-
+  useEffect(() => {
+    saveBoards(boards)
+  }, [boards])
   const boardClick = (bordKey: string) => {
     setListKey(bordKey)
   }
