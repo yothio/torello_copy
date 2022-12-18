@@ -6,67 +6,91 @@ import { createTask, testCreateTask } from "./repository"
 import { BoardType, ListType } from "./type/Data"
 import { NavbarHeader } from "./components/NavbarHeader"
 import { BoardItem } from "./components/BoardItem"
-import { NavbarBoardProps } from "./components/Navbar"
-import { Box } from "@mantine/core"
+import { NavbarBoardProps as BoardListsProps } from "./components/Navbar"
+import { Box, Flex, ScrollArea } from "@mantine/core"
+import { ListBox } from "./components/ListBox"
 
 function App() {
   // Board
   const [boards, setBoard] = useState<BoardType[]>([])
   const addBoardFunc = (title: string) => {
-    const newBoards = [...boards, { title: title + boards.length, lists: [], labels: [] }]
+    const newBoards = [
+      ...boards,
+      {
+        title: title + boards.length,
+        lists: [
+          { tasks: [], title: "Todo" },
+          { tasks: [], title: "Doing" },
+          { tasks: [], title: "Done" },
+          { tasks: [], title: "title1" },
+          { tasks: [], title: "title2" },
+          { tasks: [], title: "title3" },
+          { tasks: [], title: "title4" },
+          { tasks: [], title: "title5" },
+          { tasks: [], title: "title6" },
+          { tasks: [], title: "title7" },
+          { tasks: [], title: "title8" },
+        ],
+        labels: [],
+      },
+    ]
     console.log(newBoards)
     setBoard(newBoards)
   }
-  const navbar:NavbarBoardProps = {
-    TitleArea: <NavbarHeader onClickAdd={addBoardFunc}/>,
-    BoardList: 
-      <Box>
-        {
-          boards.map((board, index) => {
-            return (<BoardItem key={index} title={board.title}/>)
-          })
-        }
-      </Box>
-  }
 
   // List
-  const [lists, setLists] = useState<ListType>()
-
-  // Task
-  const [tasks, setTasks] = useState([testCreateTask(), createTask("abc", "content", new Date("2022-11-22"), [])])
-  const onDragEndTest = (result: DropResult) => {
-    const items = [...tasks]
+  const [lists, setLists] = useState<ListType[]>([])
+  const updateLists = (index: number) => {
+    setLists([...boards[index].lists])
+    console.log(lists)
+  }
+  const onListDragEnd = (result: DropResult) => {
+    const items = [...lists]
     const deleteItem = items.splice(result.source.index, 1)
     if (!result.destination) return
     items.splice(result.destination.index, 0, deleteItem[0])
 
-    setTasks(items)
+    setLists(items)
+    // TODO: BoardListが更新できていない
   }
+
+  const navbar: BoardListsProps = {
+    TitleArea: <NavbarHeader onClickAdd={addBoardFunc} />,
+    ListArea: (
+      <Box>
+        {boards.map((board, index) => {
+          return <BoardItem key={index} title={board.title} index={index} itemSelect={updateLists} />
+        })}
+      </Box>
+    ),
+  }
+
+  // Task
+  const [tasks, setTasks] = useState([testCreateTask(), createTask("abc", "content", new Date("2022-11-22"), [])])
 
   return (
     <Layout navbarProps={navbar}>
-      <div>
-        <DragDropContext onDragEnd={onDragEndTest}>
-          <Droppable droppableId="droppableId">
+      <DragDropContext onDragEnd={onListDragEnd}>
+        <ScrollArea type="scroll" style={{ height: "100%" }}>
+          <Droppable droppableId="droppableId" direction="horizontal">
             {(provided) => (
-              <div className="testListArea" {...provided.droppableProps} ref={provided.innerRef}>
-                {tasks.map((task, index) => {
+              <Flex className="ListArea" {...provided.droppableProps} ref={provided.innerRef}>
+                {lists.map((list, index) => {
                   return (
-                    <Draggable key={task.createDate.toString()} draggableId={task.createDate.toString()} index={index}>
+                    <Draggable key={list.title} draggableId={list.title} index={index}>
                       {(provided) => (
-                        <div className="testItem" ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                          <Task {...task} />
+                        <div className="listItem" {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
+                          {<ListBox key={list.title} list={list} />}
                         </div>
                       )}
                     </Draggable>
                   )
                 })}
-                {provided.placeholder}
-              </div>
+              </Flex>
             )}
           </Droppable>
-        </DragDropContext>
-      </div>
+        </ScrollArea>
+      </DragDropContext>
     </Layout>
   )
 }
