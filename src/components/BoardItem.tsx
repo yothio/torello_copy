@@ -1,6 +1,5 @@
 import { Text, UnstyledButton } from "@mantine/core"
 import React from "react"
-import { ListType } from "../type/Data"
 
 type BoardItemProps = {
   title: string

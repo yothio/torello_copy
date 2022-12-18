@@ -1,7 +1,7 @@
 import { AppShell } from "@mantine/core"
 import React from "react"
 import Header from "./Header"
-import { Navbar, NavbarBoardProps } from "./Navbar"
+import { Navbar, NavbarBoardProps } from "./NavBar/Navbar"
 
 type Props = {
   children: React.ReactNode

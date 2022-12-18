@@ -4,15 +4,16 @@ import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautif
 import { useState } from "react"
 import { createTask, testCreateTask } from "./repository"
 import { BoardType, ListType } from "./type/Data"
-import { NavbarHeader } from "./components/NavbarHeader"
+import { NavbarHeader } from "./components/NavBar/NavbarHeader"
 import { BoardItem } from "./components/BoardItem"
-import { NavbarBoardProps as BoardListsProps } from "./components/Navbar"
-import { Box, Flex, ScrollArea } from "@mantine/core"
+import { NavbarBoardProps as BoardListsProps } from "./components/NavBar/Navbar"
+import { Box, Flex, ScrollArea, Text } from "@mantine/core"
 import { ListBox } from "./components/ListBox"
 
 function App() {
   // Board
   const [boards, setBoard] = useState<BoardType[]>([])
+  const [selectedBoardNum, setSelectedBoardNum] = useState<number>(0)
   const addBoardFunc = (title: string) => {
     const newBoards = [
       ...boards,
@@ -37,21 +38,19 @@ function App() {
     console.log(newBoards)
     setBoard(newBoards)
   }
-
-  // List
-  const [lists, setLists] = useState<ListType[]>([])
-  const updateLists = (index: number) => {
-    setLists([...boards[index].lists])
-    console.log(lists)
+  const changeSelectedBoardNum = (index: number) => {
+    setSelectedBoardNum(index)
   }
+
   const onListDragEnd = (result: DropResult) => {
-    const items = [...lists]
+    const items = [...boards[selectedBoardNum].lists]
+    const newBoard = [...boards]
     const deleteItem = items.splice(result.source.index, 1)
     if (!result.destination) return
     items.splice(result.destination.index, 0, deleteItem[0])
 
-    setLists(items)
-    // TODO: BoardListが更新できていない
+    newBoard[selectedBoardNum].lists = items
+    setBoard(newBoard)
   }
 
   const navbar: BoardListsProps = {
@@ -59,7 +58,7 @@ function App() {
     ListArea: (
       <Box>
         {boards.map((board, index) => {
-          return <BoardItem key={index} title={board.title} index={index} itemSelect={updateLists} />
+          return <BoardItem key={index} title={board.title} index={index} itemSelect={changeSelectedBoardNum} />
         })}
       </Box>
     ),
@@ -75,17 +74,21 @@ function App() {
           <Droppable droppableId="droppableId" direction="horizontal">
             {(provided) => (
               <Flex className="ListArea" {...provided.droppableProps} ref={provided.innerRef}>
-                {lists.map((list, index) => {
-                  return (
-                    <Draggable key={list.title} draggableId={list.title} index={index}>
-                      {(provided) => (
-                        <div className="listItem" {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
-                          {<ListBox key={list.title} list={list} />}
-                        </div>
-                      )}
-                    </Draggable>
-                  )
-                })}
+                {boards.length == 0 ? (
+                  <Text>ボードがありません</Text>
+                ) : (
+                  boards[selectedBoardNum].lists.map((list, index) => {
+                    return (
+                      <Draggable key={list.title} draggableId={list.title} index={index}>
+                        {(provided) => (
+                          <div className="listItem" {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
+                            {<ListBox key={list.title} list={list} />}
+                          </div>
+                        )}
+                      </Draggable>
+                    )
+                  })
+                )}
               </Flex>
             )}
           </Droppable>
