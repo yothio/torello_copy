@@ -1,6 +1,9 @@
-import { BoardType } from "../type/Data"
+type BoardStoreType = {
+  key: string
+  value: string
+}
 
-export const getBoards = (): Array<BoardType> => {
+export const getBoards = () => {
   const item = localStorage.getItem("torello_copy_list")
   if (item == null) {
     console.log("Error: Board not found")
@@ -8,11 +11,11 @@ export const getBoards = (): Array<BoardType> => {
     return []
   }
 
-  const lists = JSON.parse(item) as Array<BoardType>
+  const lists = JSON.parse(item) as BoardStoreType[]
   return lists
 }
 
-export const saveBoards = (boards: BoardType[]) => {
+export const saveBoards = (boards: BoardStoreType[]) => {
   localStorage.setItem(createKey, JSON.stringify(boards))
 }
 

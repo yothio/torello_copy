@@ -1,5 +1,7 @@
-import { getBoards } from "./BoardRepository"
-import { testCreateTask, createTask, getTask, setTask, createKey } from "./TaskRepository"
+import { getBoards } from "./Board"
+import { getLists, saveLists } from "./List"
+import { testCreateTask, createTask, getTask, setTask, createKey } from "./Task"
 
-export { testCreateTask, createTask, getTask, setTask, createKey }
 export { getBoards }
+export { getLists, saveLists }
+export { testCreateTask, createTask, getTask, setTask, createKey }
