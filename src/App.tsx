@@ -1,6 +1,15 @@
 import { Layout } from "./components/Layout"
 import { Task } from "./components/Task"
-import { DragDropContext, Draggable, Droppable, DropResult } from "react-beautiful-dnd"
+import {
+  DragDropContext,
+  DragDropContextProps,
+  Draggable,
+  DragStart,
+  DragUpdate,
+  Droppable,
+  DropResult,
+  ResponderProvided,
+} from "react-beautiful-dnd"
 import { useState } from "react"
 import { createTask, testCreateTask } from "./repository"
 import { BoardType, ListType } from "./type/Data"
@@ -20,7 +29,8 @@ function App() {
       {
         title: title + boards.length,
         lists: [
-          { tasks: [], title: "Todo" },
+          // { tasks: [testCreateTask(), createTask("abc", "content", new Date("2022-11-22"), [])], title: "Todo" },
+          { tasks: [testCreateTask()], title: "Todo" },
           { tasks: [], title: "Doing" },
           { tasks: [], title: "Done" },
           { tasks: [], title: "title1" },
@@ -43,15 +53,49 @@ function App() {
   }
 
   const onListDragEnd = (result: DropResult) => {
-    const items = [...boards[selectedBoardNum].lists]
-    const newBoard = [...boards]
-    const deleteItem = items.splice(result.source.index, 1)
-    if (!result.destination) return
-    items.splice(result.destination.index, 0, deleteItem[0])
+    console.log("srcDroppableId: " + result.source.droppableId)
+    console.log("dstDroppableId: " + result.destination?.droppableId)
+    console.log("srcIndex: " + result.source.index)
+    console.log("dstIndex: " + result.destination?.index)
+    if (result.type == "lists") {
+      const items = [...boards[selectedBoardNum].lists]
+      const newBoard = [...boards]
+      const deleteItem = items.splice(result.source.index, 1)
+      if (!result.destination) return
+      items.splice(result.destination.index, 0, deleteItem[0])
 
-    newBoard[selectedBoardNum].lists = items
-    setBoard(newBoard)
+      newBoard[selectedBoardNum].lists = items
+      setBoard(newBoard)
+    } else if (result.type == "tasks") {
+      if (!result.destination) return
+      const srcListNum = Number(result.source.droppableId)
+      const dstListNum = Number(result.destination.droppableId)
+      const srcTaskNum = Number(result.source.index)
+      const dstTaskNum = Number(result.destination.index)
+      if (srcListNum != dstListNum) {
+        // 異なるリストへ移動
+        const srcItems = [...boards[selectedBoardNum].lists[srcListNum].tasks]
+        const dstItems = [...boards[selectedBoardNum].lists[dstListNum].tasks]
+        const newBoard = [...boards]
+        const deleteItem = srcItems.splice(srcTaskNum, 1)
+        dstItems.splice(dstTaskNum, 0, deleteItem[0])
+
+        boards[selectedBoardNum].lists[srcListNum].tasks = srcItems
+        boards[selectedBoardNum].lists[dstListNum].tasks = dstItems
+        setBoard(newBoard)
+      } else {
+        // 同じリスト内で入れ替え
+        const items = [...boards[selectedBoardNum].lists[srcListNum].tasks]
+        const newBoard = [...boards]
+        const deleteItem = items.splice(srcTaskNum, 1)
+        items.splice(dstTaskNum, 0, deleteItem[0])
+
+        newBoard[selectedBoardNum].lists[srcListNum].tasks = items
+        setBoard(newBoard)
+      }
+    }
   }
+  const onTaskDragEnd = (result: DropResult) => {}
 
   const navbar: BoardListsProps = {
     TitleArea: <NavbarHeader onClickAdd={addBoardFunc} />,
@@ -71,9 +115,9 @@ function App() {
     <Layout navbarProps={navbar}>
       <DragDropContext onDragEnd={onListDragEnd}>
         <ScrollArea type="scroll" style={{ height: "100%" }}>
-          <Droppable droppableId="droppableId" direction="horizontal">
+          <Droppable droppableId="board" direction="horizontal" type="lists">
             {(provided) => (
-              <Flex className="ListArea" {...provided.droppableProps} ref={provided.innerRef}>
+              <Flex className="ListArea" {...provided.droppableProps} ref={provided.innerRef} gap="md">
                 {boards.length == 0 ? (
                   <Text>ボードがありません</Text>
                 ) : (
@@ -82,13 +126,14 @@ function App() {
                       <Draggable key={list.title} draggableId={list.title} index={index}>
                         {(provided) => (
                           <div className="listItem" {...provided.draggableProps} {...provided.dragHandleProps} ref={provided.innerRef}>
-                            {<ListBox key={list.title} list={list} />}
+                            {<ListBox key={list.title} list={list} index={index} />}
                           </div>
                         )}
                       </Draggable>
                     )
                   })
                 )}
+                {provided.placeholder}
               </Flex>
             )}
           </Droppable>
